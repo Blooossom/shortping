@@ -28,6 +28,9 @@ public class Member {
     @Column(name = "phone")
     private String phone;
 
+    @Column(name = "money")
+    private Long money;
+
     @Column(name = "address")
     private String address;
 
@@ -43,7 +46,7 @@ public class Member {
 
     @Column(name = "member_delete")
     private boolean memberDelete;
-    
+
 
 
 }
