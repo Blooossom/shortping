@@ -20,6 +20,7 @@ bin/
 
 ### IntelliJ IDEA ###
 #application.properties
+application-mail.properties
 application-redis.properties
 application-profile.properties
 application-jwt.properties
