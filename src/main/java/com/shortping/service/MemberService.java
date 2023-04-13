@@ -2,10 +2,13 @@ package com.shortping.service;
 
 
 import com.shortping.dto.MemberReq;
+import com.shortping.dto.MemberRes;
 import com.shortping.dto.Response;
 import com.shortping.entity.Member;
 import com.shortping.exception.member.ErrorCode;
 import com.shortping.exception.member.MemberException;
+import com.shortping.jwt.JWTManager;
+import com.shortping.jwt.JWTProperties;
 import com.shortping.param.Role;
 import com.shortping.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +16,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
@@ -26,8 +31,10 @@ public class MemberService {
 
     private final PasswordEncoder encoder;
 
+    private final JWTManager manager;
+
+    private final JWTProperties properties;
     public ResponseEntity<?> signUp(MemberReq.SignUp signUp) {
-        System.out.println(signUp.getPassword().toString());
         try {
             if (memberRepo.existsByMemberEmail(signUp.getMemberEmail())) {
                 return response.fail(
@@ -53,6 +60,57 @@ public class MemberService {
             e.printStackTrace();
             throw new MemberException(ErrorCode.SIGNUP_FAILED);
         }
+    }
+
+    public ResponseEntity<?> login(MemberReq.Login login) {
+        try {
+            Member member = memberRepo.findByMemberEmail(login.getMemberEmail())
+                    .orElseThrow(() -> new MemberException(ErrorCode.NO_EXISTS_MEMBER_INFO));
+
+            if (!authPassword(login.getPassword(), member.getPassword())) {
+                return response.fail(
+                        ErrorCode.INCORRECT_PASSWORD.getMessage(),
+                        ErrorCode.INCORRECT_PASSWORD.getStatus()
+                );
+            }
+            MemberRes.TokenInfo loginInfo = new MemberRes.TokenInfo(
+                    manager.generateAccessToken(member, properties.getAccessTokenExpiredTime()),
+                    manager.generateRefreshToken(member, properties.getRefreshTokenExpiredTime()),
+                    properties.getRefreshTokenExpiredTime(),
+                    member
+            );
+            loginRedis(member.getMemberEmail(), loginInfo.getRefreshToken());
+
+            return response.success(
+                    loginInfo,
+                    "로그인 성공"
+            );
+        }
+        catch (MemberException e) {
+            e.printStackTrace();
+            throw new MemberException(ErrorCode.LOGIN_FAILED);
+        }
+    }
+
+    public boolean authPassword(String inputPassword, String originPassword) {
+        return encoder.matches(inputPassword, originPassword);
+    }
+    public void loginRedis(String email, String refreshToken) {
+        try {
+            redisTemplate.opsForValue()
+                    .set("RT : " + email, refreshToken, properties.getRefreshTokenExpiredTime(), TimeUnit.MILLISECONDS);
+
+            if (redisTemplate.opsForValue().get("RT : " + email) == null) {
+                throw new MemberException(ErrorCode.REDIS_VERIFY_FAILED);
+            }
+        }
+        catch (MemberException e) {
+            e.printStackTrace();
+            throw new MemberException(ErrorCode.REDIS_LOGIN_FAILED);
+        }
+
+
+
     }
 
 }
