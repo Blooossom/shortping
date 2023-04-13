@@ -13,6 +13,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -34,7 +36,8 @@ public class SecurityConfig {
     private CustomAuthEntityPoint customAuthEntityPoint;
 
     private static final String[] PUBLIC_URLS = {
-            "/auth/**"
+            "/auth/general/signup", "/auth/general/login", "/auth/general/send_number", "/auth/general/check_number",
+            "/auth/general/find_email", "/auth/general/find_password", "/auth/general/reset_password"
     };
 
     @Bean
@@ -87,4 +90,8 @@ public class SecurityConfig {
         return source;
     }
 
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 }
