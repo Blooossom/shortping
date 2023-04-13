@@ -20,14 +20,18 @@ public class MemberReq {
 
         private String phone;
 
-        private Long money;
-
         private String address;
 
         private String addressDetail;
 
         private String birth;
+    }
+    @Getter @Setter
+    public static class Login {
 
+        private String memberEmail;
+
+        private String password;
     }
 
 
