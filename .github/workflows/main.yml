@@ -45,7 +45,7 @@ jobs:
       run: cp ./build/libs/*.jar ./deploy
 
     - name: Make zip file
-      run: zip -r ./$GITHUB_SHA.zip ./deploy
+      run: zip -r ./Shortping.zip ./deploy
       shell: bash
 
     - name: Configure AWS credentials
@@ -56,7 +56,7 @@ jobs:
         aws-region: ap-northeast-2
 
     - name: Upload to S3
-      run: aws s3 cp --region ap-northeast-2 ./$GITHUB_SHA.zip s3://$S3_BUCKET_NAME/
+      run: aws s3 cp --region ap-northeast-2 ./Shortping.zip s3://$S3_BUCKET_NAME/
 
 # Deploy
     - name: Deploy
@@ -68,5 +68,5 @@ jobs:
         --application-name shortping
         --deployment-group-name shortping-group
         --file-exists-behavior OVERWRITE
-        --s3-location bucket=shortping-deploy,bundleType=zip,key=$GITHUB_SHA.zip
+        --s3-location bucket=$S3_BUCKET_NAME,bundleType=zip,key=Shortping.zip
         --region ap-northeast-2
