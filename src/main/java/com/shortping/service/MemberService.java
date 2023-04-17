@@ -117,9 +117,21 @@ public class MemberService {
             e.printStackTrace();
             throw new MemberException(ErrorCode.REDIS_LOGIN_FAILED);
         }
+    }
 
+    public ResponseEntity<?> logout(String email, String accessToken) {
+        try {
+            redisTemplate.delete("RT : " + email);
+            System.out.println(email);
+            Long expireTime = manager.getExpiredTime(accessToken);
 
-
+            redisTemplate.opsForValue()
+                    .set(accessToken, "logout", expireTime, TimeUnit.MILLISECONDS);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+        return response.success("로그아웃 되었습니다.");
     }
 
 

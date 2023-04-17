@@ -1,14 +1,15 @@
 package com.shortping.controller;
 
 
+import com.shortping.dto.AuthDTO;
 import com.shortping.dto.MemberReq;
 import com.shortping.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
 
 @RequiredArgsConstructor
 @RestController
@@ -32,9 +33,15 @@ public class MemberController {
     public ResponseEntity<?> login(@RequestBody MemberReq.Login login) {
         return memberService.login(login);
     }
-    /**
+     /**
      * 로그아웃
      */
+     @PostMapping("/logout")
+    public ResponseEntity<?> logout(Authentication authentication) {
+         String memberEmail = ((AuthDTO) authentication.getPrincipal()).getEmail();
+         String accessToken = authentication.getCredentials().toString();
+         return memberService.logout(memberEmail, accessToken);
+     }
 
     /**
      * 토큰 재발급
