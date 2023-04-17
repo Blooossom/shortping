@@ -1,11 +1,11 @@
-name: jwt practice server CI/CD
+name: shortping server CI/CD
 
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
   pull_request:
-    branches: [ master ]
+    branches: [ main ]
 
 env:
   S3_BUCKET_NAME: S3서비스의버킷명따옴표없이
