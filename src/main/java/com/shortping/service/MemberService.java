@@ -27,7 +27,7 @@ public class MemberService {
 
     private final Response response;
 
-    private RedisTemplate redisTemplate;
+    private final RedisTemplate redisTemplate;
 
     private final PasswordEncoder encoder;
 
@@ -79,7 +79,12 @@ public class MemberService {
                     properties.getRefreshTokenExpiredTime(),
                     member
             );
-            loginRedis(member.getMemberEmail(), loginInfo.getRefreshToken());
+            redisTemplate.opsForValue()
+                    .set("RT : " + login.getMemberEmail(),
+                            loginInfo.getRefreshToken(),
+                            properties.getRefreshTokenExpiredTime(),
+                            TimeUnit.MILLISECONDS);
+            loginRedis(member.getMemberEmail(), loginInfo);
 
             return response.success(
                     loginInfo,
@@ -95,10 +100,14 @@ public class MemberService {
     public boolean authPassword(String inputPassword, String originPassword) {
         return encoder.matches(inputPassword, originPassword);
     }
-    public void loginRedis(String email, String refreshToken) {
+    public void loginRedis(String email, MemberRes.TokenInfo tokenInfo) {
         try {
+            System.out.println(email);
             redisTemplate.opsForValue()
-                    .set("RT : " + email, refreshToken, properties.getRefreshTokenExpiredTime(), TimeUnit.MILLISECONDS);
+                    .set("RT : " + email,
+                            tokenInfo.getRefreshToken(),
+                            properties.getRefreshTokenExpiredTime(),
+                            TimeUnit.MILLISECONDS);
 
             if (redisTemplate.opsForValue().get("RT : " + email) == null) {
                 throw new MemberException(ErrorCode.REDIS_VERIFY_FAILED);
@@ -112,5 +121,7 @@ public class MemberService {
 
 
     }
+
+
 
 }
