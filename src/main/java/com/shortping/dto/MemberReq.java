@@ -34,6 +34,15 @@ public class MemberReq {
         private String password;
     }
 
+    @Getter @Setter
+    public static class FindEmail {
+
+        private String name;
+
+        private String phone;
+
+    }
+
 
 
 }
