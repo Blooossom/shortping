@@ -74,7 +74,11 @@ public class MemberController {
     /**
      * 회원 탈퇴
      */
-
+    @PutMapping("/drop")
+    public ResponseEntity<?> memberDelete(Authentication authentication) {
+        String memberEmail = ((AuthDTO)authentication.getPrincipal()).getEmail();
+        return memberService.memberDelete(memberEmail);
+    }
 
 
 

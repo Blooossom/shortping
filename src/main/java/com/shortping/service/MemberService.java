@@ -16,6 +16,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.concurrent.TimeUnit;
 
@@ -134,6 +135,18 @@ public class MemberService {
         return response.success("로그아웃 되었습니다.");
     }
 
-
+    @Transactional
+    public ResponseEntity<?> memberDelete(String memberEmail){
+        try {
+            Member member = memberRepo.findByMemberEmail(memberEmail)
+                    .orElseThrow(() -> new MemberException(ErrorCode.NO_EXISTS_MEMBER_INFO));
+            member.memberDelete();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            throw new MemberException(ErrorCode.DROP_FAILED);
+        }
+        return response.success("탈퇴되었습니다.");
+    }
 
 }
