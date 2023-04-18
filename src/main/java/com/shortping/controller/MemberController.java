@@ -58,6 +58,10 @@ public class MemberController {
     /**
      * 아이디 찾기
      */
+    @GetMapping("/find_email")
+    public ResponseEntity<?> findEmail(@RequestBody MemberReq.FindEmail findEmail) {
+        return memberService.findEmail(findEmail.getName(), findEmail.getPhone());
+    }
 
     /**
      * 비밀번호 찾기

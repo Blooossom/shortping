@@ -149,4 +149,12 @@ public class MemberService {
         return response.success("탈퇴되었습니다.");
     }
 
+    public ResponseEntity<?> findEmail(String name, String phone) {
+
+        Member member = memberRepo.findByNameAndPhone(name, phone).orElseThrow();
+
+
+        return response.success(member.getMemberEmail());
+    }
+
 }
