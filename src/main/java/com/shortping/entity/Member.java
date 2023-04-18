@@ -47,6 +47,8 @@ public class Member {
     @Column(name = "member_delete")
     private boolean memberDelete;
 
-
+    public void memberDelete() {
+        this.memberDelete = true;
+    }
 
 }
