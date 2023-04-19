@@ -157,4 +157,18 @@ public class MemberService {
         return response.success(member.getMemberEmail());
     }
 
+    @Transactional
+    public ResponseEntity<?> updateMember(String memberEmail, MemberReq.Update update) {
+        try {
+            Member member = memberRepo.findByMemberEmail(memberEmail)
+                    .orElseThrow(() -> new MemberException(ErrorCode.NO_EXISTS_MEMBER_INFO));
+            member.memberUpdate(update);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            return response.fail("실패");
+        }
+        return response.success("수정하였습니다.");
+    }
+
 }

@@ -74,6 +74,11 @@ public class MemberController {
     /**
      * 회원 정보 수정
      */
+    @PutMapping("/update")
+    public ResponseEntity<?> updateMemberInfo(Authentication authentication, @RequestBody MemberReq.Update update) {
+        String memberEmail = ((AuthDTO)authentication.getPrincipal()).getEmail();
+        return memberService.updateMember(memberEmail, update);
+    }
 
     /**
      * 회원 탈퇴
