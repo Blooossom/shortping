@@ -43,6 +43,17 @@ public class MemberReq {
 
     }
 
+    @Getter @Setter
+    public static class Update {
+
+        private String phone;
+
+        private String address;
+
+        private String addressDetail;
+
+    }
+
 
 
 }
