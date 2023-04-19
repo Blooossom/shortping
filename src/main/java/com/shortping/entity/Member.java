@@ -1,6 +1,7 @@
 package com.shortping.entity;
 
 
+import com.shortping.dto.MemberReq;
 import com.shortping.param.Role;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -49,6 +50,13 @@ public class Member {
 
     public void memberDelete() {
         this.memberDelete = true;
+    }
+
+    public void memberUpdate(MemberReq.Update update) {
+        this.phone = update.getPhone() == null || update.getPhone().equals("") ? phone:update.getPhone();
+        this.address = update.getAddress() == null || update.getAddress().equals("") ? address : update.getAddress();
+        this.addressDetail = update.getAddressDetail() == null
+                || update.getAddressDetail().equals("") ? addressDetail : update.getAddressDetail();
     }
 
 }
