@@ -14,16 +14,20 @@ import com.shortping.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
 public class MemberService {
 
+    private final JavaMailSender mailSender;
     private final MemberRepository memberRepo;
 
     private final Response response;
@@ -169,6 +173,60 @@ public class MemberService {
             return response.fail("실패");
         }
         return response.success("수정하였습니다.");
+    }
+    public String generateNumber() {
+        Random random = new Random();
+        int num = random.nextInt(900000) + 100000;
+        return String.valueOf(num);
+    }
+
+    public ResponseEntity<?> sendAuthNumber(String memberEmail){
+        try {
+            String result = generateNumber();
+            if (result == null) {
+                return response.fail(
+                        ErrorCode.NUMBER_GENERATED_FAILED
+                );
+            }
+            mailSend(memberEmail, result);
+            registAuthNumRedis(memberEmail, result);
+
+            return response.success("발송되었습니다.");
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+        return response.fail("다시 시도해주세요");
+    }
+    public void mailSend(String memberEmail, String number) {
+        SimpleMailMessage authNum = new SimpleMailMessage();
+        authNum.setSubject(memberEmail + " 인증 번호입니다.");
+        authNum.setTo(memberEmail);
+        authNum.setText(number);
+
+        try {
+            mailSender.send(authNum);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    public void registAuthNumRedis(String memberEmail, String number) {
+        redisTemplate.opsForValue()
+                .set("Auth : " + memberEmail, number,3 * 60 * 1800L, TimeUnit.MILLISECONDS);
+    }
+
+    @Transactional
+    public ResponseEntity<?> checkAuthNumber(MemberReq.AuthMail authMail) {
+        String email = authMail.getMemberEmail();
+        String number = authMail.getAuthNumber();
+        if (redisTemplate.opsForValue().get("Auth : " + email).equals(number)) {
+            redisTemplate.delete("Auth : " + email);
+            return response.success("인증되었습니다.");
+        }
+        else {
+            return response.fail("다시 확인해주세요");
+        }
     }
 
 }

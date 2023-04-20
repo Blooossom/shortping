@@ -89,7 +89,14 @@ public class MemberController {
         return memberService.memberDelete(memberEmail);
     }
 
-
+    @PostMapping("/send_number")
+    public ResponseEntity<?> sendAuthNumber(@RequestParam("memberEmail")String memberEmail) {
+        return memberService.sendAuthNumber(memberEmail);
+    }
+    @PostMapping("/check_number")
+    public ResponseEntity<?> checkAuthNumber(@RequestBody MemberReq.AuthMail authMail) {
+        return memberService.checkAuthNumber(authMail);
+    }
 
 
 
