@@ -54,6 +54,14 @@ public class MemberReq {
 
     }
 
+    @Getter @Setter
+    public static class AuthMail {
+
+        private String memberEmail;
+
+        private String authNumber;
+
+    }
 
 
 }
