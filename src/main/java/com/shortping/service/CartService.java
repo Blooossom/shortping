@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.DeleteMapping;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -74,4 +75,22 @@ public class CartService {
         return response.fail("실패");
 
     }
+
+    @Transactional
+    public ResponseEntity<?> deleteCart(String memberEmail, Long itemNum) {
+        Member member = memberRepo.findByMemberEmail(memberEmail)
+                .orElseThrow(() -> new MemberException(com.shortping.exception.member.ErrorCode.NO_EXISTS_MEMBER_INFO));
+        Item item = itemRepo.findByItemNum(itemNum)
+                .orElseThrow(() -> new ItemException(ErrorCode.ITEM_NOT_FOUND));
+        Cart cart = cartRepo.findByMemberAndItem(member, item).orElse(null);
+
+        try {
+            cartRepo.delete(cart);
+        }catch (Exception e) {
+            e.printStackTrace();
+            return response.fail("실패");
+        }
+        return response.success("성공");
+    }
+
 }

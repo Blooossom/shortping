@@ -39,8 +39,9 @@ public class CartController {
      * 장바구니 삭제
      */
     @DeleteMapping
-    public ResponseEntity<?> deleteCart(@RequestParam("itemNo") String itemNo, Authentication authentication) {
-        return null;
+    public ResponseEntity<?> deleteCart(@RequestParam("itemNo") Long itemNo, Authentication authentication) {
+        String memberEmail = ((AuthDTO)authentication.getPrincipal()).getEmail();
+        return cartService.deleteCart(memberEmail, itemNo);
     }
 
 
