@@ -1,8 +1,8 @@
 package com.shortping.service;
 
 
-import com.shortping.dto.MemberReq;
-import com.shortping.dto.MemberRes;
+import com.shortping.dto.member.MemberReq;
+import com.shortping.dto.member.MemberRes;
 import com.shortping.dto.Response;
 import com.shortping.entity.Member;
 import com.shortping.exception.member.ErrorCode;
@@ -16,7 +16,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -252,5 +251,30 @@ public class MemberService {
             e.printStackTrace();
         }
         return response.success("변경되었습니다.");
+    }
+
+    @Transactional
+    public ResponseEntity<?> findPassword(MemberReq.FindPassword findPassword) {
+        Member member = memberRepo.findByMemberEmail(findPassword.getMemberEmail())
+                .orElseThrow(() -> new MemberException(ErrorCode.NO_EXISTS_MEMBER_INFO));
+        try {
+            String newPassword = encoder.encode(findPassword.getNewPassword());
+            if (!member.getName().equals(findPassword.getName())) {
+                return response.fail(ErrorCode.NOT_EQUALS_MEMBER_NAME.getStatus(),
+                        ErrorCode.NOT_EQUALS_MEMBER_NAME.getMessage());
+            }
+            else if (!findPassword.getNewPassword().equals(findPassword.getNewPasswordCheck())) {
+                return response.fail(ErrorCode.NOT_EQUALS_NEW_PASSWORD_CHECK.getStatus(),
+                        ErrorCode.NOT_EQUALS_NEW_PASSWORD_CHECK.getMessage());
+            }
+            else {
+                member.passwordUpdate(newPassword);
+            }
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            return response.fail("실패");
+        }
+        return response.success("성공");
     }
 }

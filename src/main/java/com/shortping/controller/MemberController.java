@@ -2,14 +2,12 @@ package com.shortping.controller;
 
 
 import com.shortping.dto.AuthDTO;
-import com.shortping.dto.MemberReq;
+import com.shortping.dto.member.MemberReq;
 import com.shortping.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.HashMap;
 
 @RequiredArgsConstructor
 @RestController
@@ -63,6 +61,11 @@ public class MemberController {
     /**
      * 비밀번호 찾기 시 비밀번호 재설정
      */
+    @PutMapping("/find_password")
+    public ResponseEntity<?> findPassword(@RequestBody MemberReq.FindPassword findPassword) {
+        return memberService.findPassword(findPassword);
+    }
+
 
     /**
      * 회원 정보 내 비밀번호 재설정
