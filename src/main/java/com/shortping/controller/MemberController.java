@@ -45,6 +45,12 @@ public class MemberController {
     /**
      * 토큰 재발급
      */
+    @PostMapping("/reissue")
+    public ResponseEntity<?> reissue(Authentication authentication) {
+        String memberEmail = ((AuthDTO) authentication.getPrincipal()).getEmail();
+        String accessToken = authentication.getCredentials().toString();
+        return memberService.reissue(accessToken, memberEmail);
+    }
 
 
 

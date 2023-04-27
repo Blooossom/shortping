@@ -124,6 +124,35 @@ public class MemberService {
         }
     }
 
+    public ResponseEntity<?> reissue(String accessToken, String memberEmail){
+        try {
+            Member member = memberRepo.findByMemberEmail(memberEmail)
+                    .orElseThrow(() -> new MemberException(ErrorCode.NO_EXISTS_MEMBER_INFO));
+
+            String refreshToken = redisTemplate.opsForValue().get("RT : " + memberEmail).toString();
+
+            MemberRes.TokenInfo memberInfo = new MemberRes.TokenInfo(
+                    manager.generateAccessToken(member, properties.getAccessTokenExpiredTime()),
+                    manager.generateRefreshToken(member, properties.getRefreshTokenExpiredTime()),
+                    properties.getRefreshTokenExpiredTime()
+            );
+            redisTemplate.opsForValue().set(
+                    "RT : " + memberEmail,
+                    memberInfo.getRefreshToken(),
+                    memberInfo.getRefreshTokenExpirationTime(),
+                    TimeUnit.MILLISECONDS);
+
+            return response.success(
+                    memberInfo,
+                    "성공"
+            );
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+        return response.fail("실패");
+    }
+
     public ResponseEntity<?> logout(String email, String accessToken) {
         try {
             redisTemplate.delete("RT : " + email);
