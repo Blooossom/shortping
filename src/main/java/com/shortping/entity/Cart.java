@@ -21,6 +21,9 @@ public class Cart {
     @JoinColumn(name = "member_email")
     private Member member;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "item_num")
+    private Item item;
 
 
 
