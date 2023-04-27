@@ -1,4 +1,4 @@
-package com.shortping.dto;
+package com.shortping.dto.member;
 
 
 import lombok.AllArgsConstructor;
@@ -72,6 +72,19 @@ public class MemberReq {
 
         private String checkNewPassword;
 
+
+    }
+
+    @Getter @Setter
+    public static class FindPassword {
+
+        private String memberEmail;
+
+        private String name;
+
+        private String newPassword;
+
+        private String newPasswordCheck;
 
     }
 
