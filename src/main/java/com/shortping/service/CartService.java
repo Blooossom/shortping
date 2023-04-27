@@ -17,7 +17,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -57,6 +60,18 @@ public class CartService {
         }
         return response.success(new CartRes.addCart(item.getItemName(), LocalDateTime.now()), "장바구니에 추가하였습니다.");
 
+    }
+    public ResponseEntity<?> selectCartList(String memberEmail) {
+        List<CartRes.CartList> list = new ArrayList<>();
+        try {
+            Member member = memberRepo.findByMemberEmail(memberEmail).orElseThrow(() -> new MemberException(com.shortping.exception.member.ErrorCode.NO_EXISTS_MEMBER_INFO));
+            list = cartRepo.findByMember(member).stream().map(en -> new CartRes.CartList(en)).collect(Collectors.toList());
+            return response.success(list, "성공"  );
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+        return response.fail("실패");
 
     }
 }

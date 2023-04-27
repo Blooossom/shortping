@@ -28,6 +28,12 @@ public class CartController {
         return cartService.addCart(Long.valueOf(itemNo), memberEmail);
     }
 
+    @GetMapping
+    public ResponseEntity<?> selectList(Authentication authentication){
+        String memberEmail = ((AuthDTO)authentication.getPrincipal()).getEmail();
+        return cartService.selectCartList(memberEmail);
+    }
+
 
     /**
      * 장바구니 삭제
