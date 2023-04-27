@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity @Table(name = "cart")
 @Builder @Getter
@@ -25,7 +26,8 @@ public class Cart {
     @JoinColumn(name = "item_num")
     private Item item;
 
-
+    @Column(name = "add_at")
+    private LocalDateTime addAt;
 
 
 
