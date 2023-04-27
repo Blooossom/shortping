@@ -63,5 +63,17 @@ public class MemberReq {
 
     }
 
+    @Getter @Setter
+    public static class UpdatePassword {
+
+        private String originPassword;
+
+        private String newPassword;
+
+        private String checkNewPassword;
+
+
+    }
+
 
 }
