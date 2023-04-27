@@ -16,6 +16,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -229,4 +230,27 @@ public class MemberService {
         }
     }
 
+    @Transactional
+    public ResponseEntity<?> updatePassword(String memberEmail, MemberReq.UpdatePassword updatePassword) {
+        try {
+            String newPassword = encoder.encode(updatePassword.getNewPassword());
+            Member member = memberRepo.findByMemberEmail(memberEmail)
+                    .orElseThrow(() -> new MemberException(ErrorCode.NO_EXISTS_MEMBER_INFO));
+            if (!authPassword(updatePassword.getOriginPassword(), member.getPassword())) {
+                return response.fail(ErrorCode.INCORRECT_PASSWORD.getStatus(),
+                        ErrorCode.INCORRECT_PASSWORD.getMessage());
+            }
+            if (!updatePassword.getNewPassword().equals(updatePassword.getCheckNewPassword())) {
+                return response.fail(ErrorCode.NOT_EQUALS_NEW_PASSWORD_CHECK.getStatus(),
+                        ErrorCode.NOT_EQUALS_NEW_PASSWORD_CHECK.getMessage());
+            }
+            member.passwordUpdate(newPassword);
+            //$2a$10$Ow6ESAo0WJzJhSahb.FTb.ygJIOsOBpeK8cMzgR62BFCjtD6jTI6K
+
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+        return response.success("변경되었습니다.");
+    }
 }

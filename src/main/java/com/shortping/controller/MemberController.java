@@ -33,27 +33,24 @@ public class MemberController {
     public ResponseEntity<?> login(@RequestBody MemberReq.Login login) {
         return memberService.login(login);
     }
-     /**
+
+    /**
      * 로그아웃
      */
-     @PostMapping("/logout")
+    @PostMapping("/logout")
     public ResponseEntity<?> logout(Authentication authentication) {
          String memberEmail = ((AuthDTO) authentication.getPrincipal()).getEmail();
          String accessToken = authentication.getCredentials().toString();
          return memberService.logout(memberEmail, accessToken);
-     }
+    }
 
     /**
      * 토큰 재발급
      */
 
-    /**
-     * 이메일 인증 번호 발송
-     */
 
-    /**
-     * 이메일 인증
-     */
+
+
 
     /**
      * 아이디 찾기
@@ -64,12 +61,17 @@ public class MemberController {
     }
 
     /**
-     * 비밀번호 찾기
+     * 비밀번호 찾기 시 비밀번호 재설정
      */
 
     /**
-     * 비밀번호 재설정
+     * 회원 정보 내 비밀번호 재설정
      */
+    @PutMapping("/update_password")
+    public ResponseEntity<?> updatePassword(Authentication authentication, @RequestBody MemberReq.UpdatePassword updatePassword) {
+        String email = ((AuthDTO) authentication.getPrincipal()).getEmail();
+        return memberService.updatePassword(email, updatePassword);
+    }
 
     /**
      * 회원 정보 수정
@@ -89,10 +91,17 @@ public class MemberController {
         return memberService.memberDelete(memberEmail);
     }
 
+    /**
+     * 이메일 인증 번호 발송
+     */
     @PostMapping("/send_number")
     public ResponseEntity<?> sendAuthNumber(@RequestParam("memberEmail")String memberEmail) {
         return memberService.sendAuthNumber(memberEmail);
     }
+
+    /**
+     * 이메일 인증
+     */
     @PostMapping("/check_number")
     public ResponseEntity<?> checkAuthNumber(@RequestBody MemberReq.AuthMail authMail) {
         return memberService.checkAuthNumber(authMail);

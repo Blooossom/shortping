@@ -59,4 +59,8 @@ public class Member {
                 || update.getAddressDetail().equals("") ? addressDetail : update.getAddressDetail();
     }
 
+    public void passwordUpdate(String newPassword) {
+        this.password = newPassword;
+    }
+
 }
